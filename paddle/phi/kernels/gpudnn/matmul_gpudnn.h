@@ -140,7 +140,7 @@ void MatMulGPUDNNKernelImpl(const Context& dev_ctx,
            out_desc,
            left_desc,
            right_desc,
-           phi::backends::gpu::InternalMemAlloc);
+           phi::backends::gpu::InternalMemAlloc_matmul);
 }
 
 // also provide the sizes of tensor as a parameter, thus we dont have to
@@ -175,7 +175,7 @@ void MatMulGPUDNNKernelImpl(const Context& dev_ctx,
            out_desc,
            left_desc,
            right_desc,
-           phi::backends::gpu::InternalMemAlloc);
+           phi::backends::gpu::InternalMemAlloc_matmul);
 }
 
 template <typename T, typename Context>
@@ -213,7 +213,7 @@ void MatMulGPUDNNKernelImpl(const Context& dev_ctx,
            out_desc,
            left_desc,
            right_desc,
-           phi::backends::gpu::InternalMemAlloc);
+           phi::backends::gpu::InternalMemAlloc_matmul);
 }
 
 template <typename T, typename Context>
@@ -254,7 +254,7 @@ void BmmGPUDNNKernelImpl(const Context& dev_ctx,
            out_desc,
            left_desc,
            right_desc,
-           phi::backends::gpu::InternalMemAlloc);
+           phi::backends::gpu::InternalMemAlloc_bmm);
 }
 
 template <typename T, typename Context>
@@ -287,7 +287,7 @@ void BmmGPUDNNKernelImpl(const Context& dev_ctx,
            out_desc,
            left_desc,
            right_desc,
-           phi::backends::gpu::InternalMemAlloc);
+           phi::backends::gpu::InternalMemAlloc_bmm);
 }
 
 template <typename T, typename Context>
@@ -325,7 +325,7 @@ void BmmGPUDNNKernelImpl(const Context& dev_ctx,
            out_desc,
            left_desc,
            right_desc,
-           phi::backends::gpu::InternalMemAlloc);
+           phi::backends::gpu::InternalMemAlloc_bmm);
 }
 
 }  // namespace phi

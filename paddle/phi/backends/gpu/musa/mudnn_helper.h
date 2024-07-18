@@ -17,6 +17,7 @@ limitations under the License. */
 #include <string>
 #include <vector>
 
+#include "gtest/internal/gtest-internal.h"
 #include "paddle/common/ddim.h"
 #include "paddle/phi/backends/dynload/mudnn.h"
 #include "paddle/phi/common/bfloat16.h"
@@ -458,6 +459,64 @@ static dynload::MemoryHandler InternalMemAlloc(size_t s) {
   }
   return dynload::MemoryHandler(data, InternalMemFree);
 }
+
+
+static size_t flash_bwd_size=0;
+static void* flash_bwd_data=nullptr;
+
+static void InternalMemFree_flash_attn_bwd(void* ptr) {
+
+}
+static dynload::MemoryHandler InternalMemAlloc_flash_attn_bwd(size_t s) {
+  if(s>flash_bwd_size){
+    if(flash_bwd_data!=nullptr){
+      PADDLE_ENFORCE_GPU_SUCCESS(musaFree(flash_bwd_data));
+    }
+    flash_bwd_size=s;
+    PADDLE_ENFORCE_GPU_SUCCESS(musaMalloc(&flash_bwd_data, flash_bwd_size));  
+  }
+  return dynload::MemoryHandler(flash_bwd_data, InternalMemFree_flash_attn_bwd);
+}
+
+
+
+static size_t bmm_bwd_size=0;
+static void* bmm_bwd_data=nullptr;
+
+static void InternalMemFree_bmm(void* ptr) {
+
+}
+static dynload::MemoryHandler InternalMemAlloc_bmm(size_t s) {
+  if(s>bmm_bwd_size){
+    if(bmm_bwd_data!=nullptr){
+      PADDLE_ENFORCE_GPU_SUCCESS(musaFree(bmm_bwd_data));
+    }
+    bmm_bwd_size=s;
+    PADDLE_ENFORCE_GPU_SUCCESS(musaMalloc(&bmm_bwd_data, bmm_bwd_size));  
+  }
+  return dynload::MemoryHandler(bmm_bwd_data, InternalMemFree_bmm);
+}
+
+
+
+
+static size_t matmul_bwd_size=0;
+static void* matmul_bwd_data=nullptr;
+
+static void InternalMemFree_matmul(void* ptr) {
+
+}
+static dynload::MemoryHandler InternalMemAlloc_matmul(size_t s) {
+  if(s>matmul_bwd_size){
+    if(matmul_bwd_data!=nullptr){
+      PADDLE_ENFORCE_GPU_SUCCESS(musaFree(matmul_bwd_data));
+    }
+    matmul_bwd_size=s;
+    PADDLE_ENFORCE_GPU_SUCCESS(musaMalloc(&matmul_bwd_data, matmul_bwd_size));  
+  }
+  return dynload::MemoryHandler(matmul_bwd_data, InternalMemFree_matmul);
+}
+
 
   template <>
   inline dynload::Tensor& ScopedTensorDescriptor::descriptor_with_stride<phi::dtype::complex<float>>(const phi::DenseTensor& tensor,

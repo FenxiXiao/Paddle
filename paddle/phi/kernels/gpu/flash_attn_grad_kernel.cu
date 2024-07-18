@@ -305,7 +305,7 @@ void FlashAttnGradKernel(const Context& ctx,
       musa_output,
       musa_logsumexp,
       musa_dropout_mask,
-      phi::backends::gpu::InternalMemAlloc);
+      phi::backends::gpu::InternalMemAlloc_flash_attn_bwd);
 
 
 #else
