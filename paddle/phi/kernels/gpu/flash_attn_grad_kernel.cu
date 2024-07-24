@@ -38,11 +38,6 @@ using ScopedTensorDescriptor =
     phi::backends::gpu::ScopedTensorDescriptor;
 using GPUDNNDataLayout = phi::backends::gpu::DataLayout;
 
-static void InternalMemFree_flash_attn_bwd(void* ptr) {
-
-}
-
-
 
 inline bool is_pad_mask(const DenseTensor& mask, const DenseTensor& query) {
   return mask.dims().size() == 2 && mask.dims()[0] == query.dims()[0] &&
@@ -297,13 +292,7 @@ void FlashAttnGradKernel(const Context& ctx,
   auto& musa_dropout_mask = dropout_mask_scoped_desc.descriptor_with_stride<T>(
       dropout_mask, GPUDNNDataLayout::kNCHW, common::vectorize<int>(dropout_mask.dims()));
   
-  Allocator::AllocationPtr memory_for_mudnn; //this is a unique ptr so the memory it holds will be free when it is out of its scope
-
-  auto InternalMemAlloc_flash_attn_bwd = [&memory_for_mudnn, &ctx](size_t s) {
-    memory_for_mudnn = std::move(phi::memory_utils::Alloc(ctx.GetPlace(),s,phi::Stream(reinterpret_cast<phi::StreamId>(ctx.stream()))));
-    return dynload::MemoryHandler(memory_for_mudnn->ptr(), InternalMemFree_flash_attn_bwd);
-  };
-
+  // auto alloc = backends::gpu::InternalMalloc<Context>(ctx);
   sdpa.desc_.RunFlashBwd(
       *ctx.cudnn_handle(),
       musa_grad_query,
@@ -317,8 +306,7 @@ void FlashAttnGradKernel(const Context& ctx,
       musa_output,
       musa_logsumexp,
       musa_dropout_mask,
-      InternalMemAlloc_flash_attn_bwd);
-
+      backends::gpu::InternalMalloc<Context>(ctx));
 
 #else
   RaiseNotSupportedError();
